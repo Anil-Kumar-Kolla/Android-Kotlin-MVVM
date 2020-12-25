@@ -1,34 +1,35 @@
 package com.example.android_kotlin_mvvm.activities
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.android_kotlin_mvvm.R
-import com.example.android_kotlin_mvvm.api.RetrofitService
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.example.android_kotlin_mvvm.models.Response
+import com.example.android_kotlin_mvvm.viewmodels.CurrentWeatherActivityViewModel
+import kotlinx.android.synthetic.main.activity_current_weather.*
 
 class CurrentWeatherActivity : AppCompatActivity() {
-    private lateinit var retrofitService: RetrofitService
+    private lateinit var viewModel: CurrentWeatherActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_current_weather)
 
-        fetchCurrentWeather()
+        setupViewModel()
+        observeData()
     }
 
-    private fun fetchCurrentWeather() {
+    private fun setupViewModel() {
+        viewModel = ViewModelProvider(this).get(CurrentWeatherActivityViewModel::class.java)
+        viewModel.fetchCurrentWeather()
+    }
 
-        retrofitService = RetrofitService.create()
+    private fun observeData() {
+        val responseObserver = Observer<Response> { response ->
+            response_text.text = "RESPONSE ---> " + response
+        }
 
-        retrofitService.fetchCurrentWeather("London", "9e79702348d6328424e5d313c699a80e")
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe ({ result ->
-                Log.d("Result", "${result}")
-            }, {
-                    error -> error.printStackTrace()
-            })
+        viewModel.response.observe(this, responseObserver)
     }
 }

@@ -13,11 +13,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_main)
 
         button1.setOnClickListener(this)
+        button2.setOnClickListener(this)
     }
 
     override fun onClick(v: View?) {
         if (v?.id == button1.id) {
             val intent = Intent(this, CurrentWeatherActivity::class.java)
+            startActivity(intent)
+
+        } else {
+            val intent = Intent(this, ForeCastActivity::class.java)
             startActivity(intent)
         }
     }
